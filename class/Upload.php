@@ -100,7 +100,8 @@ class Upload{
 		
 		$filename = $this->generateFileName($this->tmpFile['tmp_name']);
 		if(!move_uploaded_file($this->tmpFile['tmp_name'], $this->path.'/'.$filename.'.'.$this->getExt()))
-			throw new Exception("move to hash folder failed", 1);		
+			throw new Exception("move to hash folder failed", 1);
+		return $this->dir.'/'.$this->id.'/'.$filename.'.'.$this->getExt();
 	}
 
 	/**
@@ -167,10 +168,19 @@ class Upload{
 	public function save($id){
 		$oldFolder = $this->tmpRoot.$this->dir.'/'.$this->id;
 		$newFolder = $this->root.$this->dir.'/'.$id;
+
+		$list = scandir($oldFolder);
+		$list = array_slice($list, 2);
+		foreach ($list as $key => $img) {
+			$list[$key] = $this->dir.'/'.$id.'/'.$img;
+		}
+
 		if(!$this->checkFloder($oldFolder))
 			throw new Exception("hash dir not found", 1);
 		if(!$this->move($oldFolder, $newFolder))
-			throw new Exception("move file failed", 1);			
+			throw new Exception("move file failed", 1);
+
+		return $list;
 	}
 
 	public function getList(){

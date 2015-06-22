@@ -11,6 +11,7 @@ $cate = isset($_GET['cate']) ? $_GET['cate'] : '';
 
 $result = false;
 $info = '';
+$data = [];
 if($key != $dog->key){
 	$info = 'access deny';
 }elseif (!$hash) {
@@ -22,14 +23,14 @@ if($key != $dog->key){
 }else{
 	$upload = new Upload($cate, $hash);
 	try {
-		$upload->save($id);
+		$data = $upload->save($id);
 		$result = true;
 		$info = 'success';
 	} catch (Exception $e) {
 		$info = $e->getMessage();
 	}
 }
-$re = ['result' => $result, 'data' => [], 'info' => $info];
+$re = ['result' => $result, 'data' => $data, 'info' => $info];
 
 echo json_encode($re);
 exit;
