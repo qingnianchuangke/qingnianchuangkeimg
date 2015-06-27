@@ -3,7 +3,8 @@
 * TheBouqs Company - Custom Class
 * @author Kydz
 */
-class Upload{
+class Upload
+{
 
     /*associated system e.g. customer message attachment*/
     public $category;
