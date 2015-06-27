@@ -3,10 +3,12 @@
 require_once('class/Watchdog.php');
 require_once('class/Upload.php');
 
+error_reporting(E_ERROR);
+
 $dog = new Watchdog();
-$key = isset($_GET['key']) ? $_GET['key'] : '';
-$hash = isset($_GET['hash']) ? $_GET['hash'] : '';
-$cate = isset($_GET['cate']) ? $_GET['cate'] : '';
+$key = isset($_REQUEST['key']) ? $_REQUEST['key'] : '';
+$hash = isset($_REQUEST['imgToken']) ? $_REQUEST['imgToken'] : '';
+$cate = isset($_REQUEST['cate']) ? $_REQUEST['cate'] : '';
 
 $result = false;
 $info = '';
