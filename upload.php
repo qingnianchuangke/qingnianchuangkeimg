@@ -6,17 +6,14 @@ require_once('class/Upload.php');
 error_reporting(E_ERROR);
 
 $dog = new Watchdog();
-$key = isset($_REQUEST['key']) ? $_REQUEST['key'] : '';
 $hash = isset($_REQUEST['imgToken']) ? $_REQUEST['imgToken'] : '';
 $cate = isset($_REQUEST['cate']) ? $_REQUEST['cate'] : '';
 
 $result = false;
 $info = '';
 $data = [];
-if ($key != $dog->key) {
-    $info = 'access deny';
-} elseif (!$hash) {
-    $info = 'need hash string';
+if (!$hash) {
+    $info = 'need img token';
 } elseif (!$cate) {
     $info = 'need cate string';
 } else {
@@ -27,7 +24,8 @@ if ($key != $dog->key) {
             $upload = new Upload($cate, $hash);
             foreach ($_FILES as $key => $file) {
                 if ($file['name'] && $file['error'] == 0 && $file['size'] > 0) {
-                    $data[] = $upload->upload($file);
+                    $file['key'] = $key;
+                    $data[] = $dog->host.$upload->upload($file);
                 }
             }
             $result = true;

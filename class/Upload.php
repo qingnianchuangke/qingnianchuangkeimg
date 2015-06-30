@@ -43,6 +43,15 @@ class Upload
         $this->id = $id;
     }
 
+    public function getKey($filename)
+    {
+        if (!$tmp = explode('.', $filename)) {
+            return false;
+        }
+
+        return $tmp[0];
+    }
+
     /**
      * [getExt get file extention]
      * @return [string] [extention]
@@ -105,6 +114,7 @@ class Upload
         }
         
         $filename = $this->generateFileName($this->tmpFile['tmp_name']);
+        $filename = $this->tmpFile['key'].'.'.$filename;
         if (!move_uploaded_file($this->tmpFile['tmp_name'], $this->path.'/'.$filename.'.'.$this->getExt())) {
             throw new Exception("move to hash folder failed", 1);
         }
@@ -116,10 +126,10 @@ class Upload
      * @return [bool] [description]
      * @author Kydz 2014.12.25
      */
-    public function remove()
+    public function remove($path)
     {
-        if (file_exists($this->getDownloadPath())) {
-            unlink($this->getDownloadPath());
+        if (file_exists($path)) {
+            return unlink($path);
         }
         return true;
     }
@@ -182,20 +192,47 @@ class Upload
         $oldFolder = $this->tmpRoot.$this->dir.'/'.$this->id;
         $newFolder = $this->root.$this->dir.'/'.$id;
 
-        $list = scandir($oldFolder);
-        $list = array_slice($list, 2);
-        foreach ($list as $key => $img) {
-            $list[$key] = $this->dir.'/'.$id.'/'.$img;
-        }
-
         if (!$this->checkFloder($oldFolder)) {
             throw new Exception("hash dir not found", 1);
         }
-        if (!$this->move($oldFolder, $newFolder)) {
-            throw new Exception("move file failed", 1);
+        if (!$this->checkFloder($newFolder)) {
+            throw new Exception("new dir not found", 1);
         }
 
-        return $list;
+        $o = scandir($oldFolder);
+        $o = array_slice($o, 2);
+        $origin = [];
+
+        $t = scandir($newFolder);
+        $t = array_slice($t, 2);
+        $target = [];
+
+        foreach ($o as $img) {
+            $key = $this->getKey($img);
+            $origin[$key] = $img;
+        }
+
+        foreach ($t as $img) {
+            $key = $this->getKey($img);
+            $target[$key] = $img;
+        }
+        $delete = array_intersect_key($target, $origin);
+
+        $tmpPath = $this->dir.'/'.$this->id.'/';
+        $path = $this->dir.'/'.$id.'/';
+        foreach ($delete as $key => $value) {
+            if (!$this->remove($this->root.$path.$value)) {
+                throw new Exception("delete file failed", 1);
+            }
+        }
+
+        foreach ($origin as $key => $value) {
+            if (!$this->move($this->tmpRoot.$tmpPath.$value, $this->root.$path.$value)) {
+                throw new Exception("move file failed", 1);
+            }
+        }
+
+        return $origin;
     }
 
     public function getList()
