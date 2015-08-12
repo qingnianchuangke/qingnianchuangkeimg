@@ -200,19 +200,23 @@ class Upload
         }
 
         $o = scandir($oldFolder);
-        $o = array_slice($o, 2);
         $origin = [];
 
         $t = scandir($newFolder);
-        $t = array_slice($t, 2);
         $target = [];
 
         foreach ($o as $img) {
+            if ($this->isBanned($img)) {
+                continue;
+            }
             $key = $this->getKey($img);
             $origin[$key] = $img;
         }
 
         foreach ($t as $img) {
+            if ($this->isBanned($img)) {
+                continue;
+            }
             $key = $this->getKey($img);
             $target[$key] = $img;
         }
@@ -242,10 +246,21 @@ class Upload
             return [];
         }
         $list = scandir($folder);
-        $list = array_slice($list, 2);
         foreach ($list as $key => $img) {
+            if ($this->isBanned($img)) {
+                unset($list[$key]);
+                continue;
+            }
             $list[$key] = $this->dir.'/'.$this->id.'/'.$img;
         }
         return $list;
+    }
+
+    public function isBanned($file)
+    {
+        if (strpos($file, '.') === 0) {
+            return true;
+        }
+        return false;
     }
 }

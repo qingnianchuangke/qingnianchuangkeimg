@@ -6,10 +6,10 @@ require_once('class/Upload.php');
 error_reporting(E_ERROR);
 
 $dog = new Watchdog();
-$hash = isset($_REQUEST['imgToken']) ? $_REQUEST['imgToken'] : '';
+$hash = isset($_REQUEST['img_token']) ? $_REQUEST['img_token'] : '';
 $cate = isset($_REQUEST['cate']) ? $_REQUEST['cate'] : '';
 
-$result = false;
+$result = 2001;
 $info = '';
 $data = [];
 if (!$hash) {
@@ -28,7 +28,7 @@ if (!$hash) {
                     $data[] = $dog->host.$upload->upload($file);
                 }
             }
-            $result = true;
+            $result = 2000;
             $info = 'success';
         } catch (Exception $e) {
             $info = $e->getMessage();
